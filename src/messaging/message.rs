@@ -72,6 +72,16 @@ pub enum Message {
         #[serde(rename = "stickerId")]
         sticker_id: String,
     },
+
+    ImageMessage {
+        sender: Option<Sender>,
+        #[serde(rename = "type")]
+        message_type: String,
+        #[serde(rename = "originalContentUrl")]
+        original_content_url: String,
+        #[serde(rename = "previewImageUrl")]
+        preview_image_url: String,
+    },
 }
 
 impl Message {
@@ -98,6 +108,19 @@ impl Message {
             message_type: String::from("sticker"),
             package_id: package_id.into(),
             sticker_id: sticker_id.into(),
+        }
+    }
+
+    pub fn new_image_message<S: Into<String>>(
+        original_content_url: S,
+        preview_image_url: S,
+        sender: Option<Sender>,
+    ) -> Message {
+        Message::StickerMessage {
+            sender: sender,
+            message_type: String::from("sticker"),
+            package_id: original_content_url.into(),
+            sticker_id: preview_image_url.into(),
         }
     }
 }
