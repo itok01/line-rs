@@ -1,7 +1,8 @@
-use reqwest::header;
 use reqwest::StatusCode;
 use serde::Serialize;
 use std::error::Error;
+
+use super::client::post_json;
 
 const BROADCAST_API: &str = "https://api.line.me/v2/bot/message/broadcast";
 
@@ -13,7 +14,7 @@ pub struct Sender {
 }
 
 impl Sender {
-    pub fn new(name: Option<String>, icon_url: Option<String>) -> Sender {
+    pub fn new<S: Into<String>>(name: Option<String>, icon_url: Option<String>) -> Sender {
         Sender {
             name: name,
             icon_url: icon_url,
@@ -31,11 +32,11 @@ pub struct Emoji {
 }
 
 impl Emoji {
-    pub fn new(index: usize, product_id: String, emoji_id: String) -> Emoji {
+    pub fn new<S: Into<String>>(index: usize, product_id: S, emoji_id: S) -> Emoji {
         Emoji {
             index: index,
-            product_id: product_id,
-            emoji_id: emoji_id,
+            product_id: product_id.into(),
+            emoji_id: emoji_id.into(),
         }
     }
 }
@@ -61,11 +62,15 @@ pub struct TextMessage {
 }
 
 impl TextMessage {
-    pub fn new(sender: Option<Sender>, text: String, emojis: Option<Emojis>) -> TextMessage {
+    pub fn new<S: Into<String>>(
+        sender: Option<Sender>,
+        text: S,
+        emojis: Option<Emojis>,
+    ) -> TextMessage {
         TextMessage {
             sender: sender,
             message_type: String::from("text"),
-            text: text,
+            text: text.into(),
             emojis: emojis,
         }
     }
@@ -92,14 +97,7 @@ pub async fn broadcast(
 ) -> Result<BroadcastResponse, Box<dyn Error>> {
     let messages_json = serde_json::to_string(&messages)?;
 
-    let client = reqwest::Client::new();
-    let res: reqwest::Response = client
-        .post(BROADCAST_API)
-        .header(header::CONTENT_TYPE, "application/json")
-        .bearer_auth(channel_access_token)
-        .body(messages_json)
-        .send()
-        .await?;
+    let res = post_json(channel_access_token, BROADCAST_API, &messages_json).await?;
 
     Ok(BroadcastResponse {
         status: res.status(),
