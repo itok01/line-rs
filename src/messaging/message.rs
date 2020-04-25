@@ -405,7 +405,7 @@ impl Messages {
 }
 
 #[derive(Serialize)]
-pub struct ReplyRequest {
+pub struct SendReplyMessageRequest {
     #[serde(rename = "replyToken")]
     pub reply_token: String,
     pub messages: Messages,
@@ -413,39 +413,39 @@ pub struct ReplyRequest {
     pub notification_disabled: Option<bool>,
 }
 
-pub struct ReplyResponse {
+pub struct SendReplyMessageResponse {
     pub status: StatusCode,
     pub system_message: String,
 }
 
 pub async fn send_reply_message(
     channel_access_token: &str,
-    request: ReplyRequest,
-) -> Result<ReplyResponse, Box<dyn Error>> {
+    request: SendReplyMessageRequest,
+) -> Result<SendReplyMessageResponse, Box<dyn Error>> {
     let request_json = serde_json::to_string(&request)?;
 
     let res = post_json(channel_access_token, SEND_REPLY_MESSAGE_API, &request_json).await?;
 
-    Ok(ReplyResponse {
+    Ok(SendReplyMessageResponse {
         status: res.status(),
         system_message: res.text().await?,
     })
 }
 
 #[derive(Serialize)]
-pub struct BroadcastRequest {
+pub struct SendBroadcastMessageRequest {
     pub messages: Messages,
 }
 
-pub struct BroadcastResponse {
+pub struct SendBroadcastMessageResponse {
     pub status: StatusCode,
     pub system_message: String,
 }
 
 pub async fn send_broadcast_message(
     channel_access_token: &str,
-    request: BroadcastRequest,
-) -> Result<BroadcastResponse, Box<dyn Error>> {
+    request: SendBroadcastMessageRequest,
+) -> Result<SendBroadcastMessageResponse, Box<dyn Error>> {
     let request_json = serde_json::to_string(&request)?;
 
     let res = post_json(
@@ -455,7 +455,7 @@ pub async fn send_broadcast_message(
     )
     .await?;
 
-    Ok(BroadcastResponse {
+    Ok(SendBroadcastMessageResponse {
         status: res.status(),
         system_message: res.text().await?,
     })
