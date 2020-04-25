@@ -12,6 +12,15 @@ pub struct Sender {
     pub icon_url: Option<String>,
 }
 
+impl Sender {
+    pub fn new(name: Option<String>, icon_url: Option<String>) -> Sender {
+        Sender {
+            name: name,
+            icon_url: icon_url,
+        }
+    }
+}
+
 #[derive(Serialize)]
 pub struct Emoji {
     pub index: usize,
