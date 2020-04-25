@@ -53,63 +53,65 @@ impl Emojis {
 }
 
 #[derive(Serialize)]
-pub struct TextMessage {
-    pub sender: Option<Sender>,
-    #[serde(rename = "type")]
-    pub message_type: String,
-    pub text: String,
-    pub emojis: Option<Emojis>,
+#[serde(untagged)]
+pub enum Message {
+    TextMessage {
+        sender: Option<Sender>,
+        #[serde(rename = "type")]
+        message_type: String,
+        text: String,
+        emojis: Option<Emojis>,
+    },
+
+    StickerMessage {
+        sender: Option<Sender>,
+        #[serde(rename = "type")]
+        message_type: String,
+        #[serde(rename = "packageId")]
+        package_id: String,
+        #[serde(rename = "stickerId")]
+        sticker_id: String,
+    },
 }
 
-impl TextMessage {
-    pub fn new<S: Into<String>>(
+impl Message {
+    pub fn new_text_message<S: Into<String>>(
         text: S,
         emojis: Option<Emojis>,
         sender: Option<Sender>,
-    ) -> TextMessage {
-        TextMessage {
+    ) -> Message {
+        Message::TextMessage {
             sender: sender,
             message_type: String::from("text"),
             text: text.into(),
             emojis: emojis,
         }
     }
-}
 
-#[derive(Serialize)]
-pub struct StickerMessage {
-    pub sender: Option<Sender>,
-    #[serde(rename = "type")]
-    pub message_type: String,
-    #[serde(rename = "packageId")]
-    pub package_id: String,
-    #[serde(rename = "stickerId")]
-    pub sticker_id: String,
-}
-
-impl StickerMessage {
-    pub fn new<S: Into<String>>(
-        package_id: String,
-        sticker_id: String,
+    pub fn new_sticker_message<S: Into<String>>(
+        package_id: S,
+        sticker_id: S,
         sender: Option<Sender>,
-    ) -> StickerMessage {
-        StickerMessage {
+    ) -> Message {
+        Message::StickerMessage {
             sender: sender,
             message_type: String::from("sticker"),
-            package_id: package_id,
-            sticker_id: sticker_id,
+            package_id: package_id.into(),
+            sticker_id: sticker_id.into(),
         }
     }
 }
 
 #[derive(Serialize)]
 pub struct Messages {
-    pub messages: Vec<TextMessage>,
+    pub messages: Vec<Message>,
 }
 
 impl Messages {
-    pub fn new(messages: Vec<TextMessage>) -> Messages {
-        Messages { messages: messages }
+    pub fn new() -> Messages {
+        Messages {
+            messages: Vec::new(),
+        }
     }
 }
 
@@ -122,6 +124,7 @@ pub async fn broadcast(
     messages: Messages,
 ) -> Result<BroadcastResponse, Box<dyn Error>> {
     let messages_json = serde_json::to_string(&messages)?;
+    println!("{}", messages_json);
 
     let res = post_json(channel_access_token, BROADCAST_API, &messages_json).await?;
 
