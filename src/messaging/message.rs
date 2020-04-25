@@ -402,17 +402,23 @@ impl Messages {
     }
 }
 
+#[derive(Serialize)]
+#[serde(transparent)]
+pub struct BroadcastRequest {
+    pub messages: Messages,
+}
+
 pub struct BroadcastResponse {
     pub status: StatusCode,
 }
 
 pub async fn broadcast(
     channel_access_token: &str,
-    messages: Messages,
+    request: BroadcastRequest,
 ) -> Result<BroadcastResponse, Box<dyn Error>> {
-    let messages_json = serde_json::to_string(&messages)?;
+    let request_json = serde_json::to_string(&request)?;
 
-    let res = post_json(channel_access_token, SEND_BROADCAST_API, &messages_json).await?;
+    let res = post_json(channel_access_token, SEND_BROADCAST_API, &request_json).await?;
 
     Ok(BroadcastResponse {
         status: res.status(),
