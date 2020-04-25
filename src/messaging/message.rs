@@ -82,6 +82,16 @@ pub enum Message {
         #[serde(rename = "previewImageUrl")]
         preview_image_url: String,
     },
+
+    VideoMessage {
+        sender: Option<Sender>,
+        #[serde(rename = "type")]
+        message_type: String,
+        #[serde(rename = "originalContentUrl")]
+        original_content_url: String,
+        #[serde(rename = "previewImageUrl")]
+        preview_image_url: String,
+    },
 }
 
 impl Message {
@@ -117,6 +127,19 @@ impl Message {
         sender: Option<Sender>,
     ) -> Message {
         Message::ImageMessage {
+            sender: sender,
+            message_type: String::from("image"),
+            original_content_url: original_content_url.into(),
+            preview_image_url: preview_image_url.into(),
+        }
+    }
+
+    pub fn new_video_message<S: Into<String>>(
+        original_content_url: S,
+        preview_image_url: S,
+        sender: Option<Sender>,
+    ) -> Message {
+        Message::VideoMessage {
             sender: sender,
             message_type: String::from("image"),
             original_content_url: original_content_url.into(),
