@@ -452,7 +452,7 @@ pub async fn send_push_message(
 ) -> Result<SendPushMessageResponse, Box<dyn Error>> {
     let request_json = serde_json::to_string(&request)?;
 
-    let res = post_json(channel_access_token, SEND_REPLY_MESSAGE_API, &request_json).await?;
+    let res = post_json(channel_access_token, SEND_PUSH_MESSAGE_API, &request_json).await?;
 
     Ok(SendPushMessageResponse {
         status: res.status(),
