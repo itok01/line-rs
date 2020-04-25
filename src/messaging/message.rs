@@ -99,7 +99,6 @@ pub enum Message {
         message_type: String,
         #[serde(rename = "originalContentUrl")]
         original_content_url: String,
-        #[serde(rename = "duration")]
         duration: usize,
     },
 }
