@@ -141,7 +141,7 @@ impl Message {
     ) -> Message {
         Message::VideoMessage {
             sender: sender,
-            message_type: String::from("image"),
+            message_type: String::from("video"),
             original_content_url: original_content_url.into(),
             preview_image_url: preview_image_url.into(),
         }
