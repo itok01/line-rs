@@ -124,27 +124,56 @@ impl Video {
 }
 
 #[derive(Serialize)]
-pub struct Action {
-    sender: Option<Sender>,
-    #[serde(rename = "type")]
-    message_type: String,
-    #[serde(rename = "originalContentUrl")]
-    original_content_url: String,
-    #[serde(rename = "previewImageUrl")]
-    preview_image_url: String,
+#[serde(untagged)]
+pub enum Action {
+    URI {
+        sender: Option<Sender>,
+        #[serde(rename = "type")]
+        action_type: String,
+        label: String,
+        #[serde(rename = "linkUri")]
+        link_uri: String,
+        area: Area,
+    },
+
+    Message {
+        sender: Option<Sender>,
+        #[serde(rename = "type")]
+        action_type: String,
+        label: String,
+        text: String,
+        area: Area,
+    },
 }
 
 impl Action {
-    pub fn new<S: Into<String>>(
-        original_content_url: S,
-        preview_image_url: S,
+    pub fn new_uri_action<S: Into<String>>(
+        label: S,
+        link_uri: S,
+        area: Area,
         sender: Option<Sender>,
     ) -> Action {
-        Action {
+        Action::URI {
             sender: sender,
-            message_type: String::from("video"),
-            original_content_url: original_content_url.into(),
-            preview_image_url: preview_image_url.into(),
+            action_type: String::from("uri"),
+            label: label.into(),
+            link_uri: link_uri.into(),
+            area,
+        }
+    }
+
+    pub fn new_message_action<S: Into<String>>(
+        label: S,
+        text: S,
+        area: Area,
+        sender: Option<Sender>,
+    ) -> Action {
+        Action::Message {
+            sender: sender,
+            action_type: String::from("uri"),
+            label: label.into(),
+            text: text.into(),
+            area,
         }
     }
 }
