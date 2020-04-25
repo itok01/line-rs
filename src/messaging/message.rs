@@ -14,7 +14,7 @@ pub struct Sender {
 }
 
 impl Sender {
-    pub fn new<S: Into<String>>(name: Option<String>, icon_url: Option<String>) -> Sender {
+    pub fn new(name: Option<String>, icon_url: Option<String>) -> Sender {
         Sender {
             name: name,
             icon_url: icon_url,
