@@ -101,6 +101,16 @@ pub enum Message {
         original_content_url: String,
         duration: usize,
     },
+
+    LocationMessage {
+        sender: Option<Sender>,
+        #[serde(rename = "type")]
+        message_type: String,
+        title: String,
+        address: String,
+        latitude: f64,
+        longitude: f64,
+    },
 }
 
 impl Message {
@@ -166,6 +176,23 @@ impl Message {
             message_type: String::from("audio"),
             original_content_url: original_content_url.into(),
             duration: duration,
+        }
+    }
+
+    pub fn new_location_message<S: Into<String>>(
+        title: S,
+        address: S,
+        latitude: f64,
+        longitude: f64,
+        sender: Option<Sender>,
+    ) -> Message {
+        Message::LocationMessage {
+            sender: sender,
+            message_type: String::from("location"),
+            title: title.into(),
+            address: address.into(),
+            latitude: latitude,
+            longitude: longitude,
         }
     }
 }
