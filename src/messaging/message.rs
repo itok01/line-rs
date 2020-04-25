@@ -381,6 +381,7 @@ impl Message {
 }
 
 #[derive(Serialize)]
+#[serde(transparent)]
 pub struct Messages {
     pub messages: RefCell<Vec<Message>>,
 }
@@ -403,13 +404,13 @@ impl Messages {
 }
 
 #[derive(Serialize)]
-#[serde(transparent)]
 pub struct BroadcastRequest {
     pub messages: Messages,
 }
 
 pub struct BroadcastResponse {
     pub status: StatusCode,
+    pub system_message: String,
 }
 
 pub async fn broadcast(
@@ -422,5 +423,6 @@ pub async fn broadcast(
 
     Ok(BroadcastResponse {
         status: res.status(),
+        system_message: res.text().await?,
     })
 }
