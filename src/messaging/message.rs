@@ -92,6 +92,16 @@ pub enum Message {
         #[serde(rename = "previewImageUrl")]
         preview_image_url: String,
     },
+
+    AudioMessage {
+        sender: Option<Sender>,
+        #[serde(rename = "type")]
+        message_type: String,
+        #[serde(rename = "originalContentUrl")]
+        original_content_url: String,
+        #[serde(rename = "duration")]
+        duration: usize,
+    },
 }
 
 impl Message {
@@ -144,6 +154,19 @@ impl Message {
             message_type: String::from("video"),
             original_content_url: original_content_url.into(),
             preview_image_url: preview_image_url.into(),
+        }
+    }
+
+    pub fn new_audio_message<S: Into<String>>(
+        original_content_url: S,
+        duration: usize,
+        sender: Option<Sender>,
+    ) -> Message {
+        Message::AudioMessage {
+            sender: sender,
+            message_type: String::from("audio"),
+            original_content_url: original_content_url.into(),
+            duration: duration,
         }
     }
 }
