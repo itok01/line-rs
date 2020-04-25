@@ -5,7 +5,30 @@ use std::error::Error;
 
 use super::client::post_json;
 
-const BROADCAST_API: &str = "https://api.line.me/v2/bot/message/broadcast";
+const SEND_REPLY_API: &str = "https://api.line.me/v2/bot/message/reply";
+const SEND_PUSH_API: &str = "https://api.line.me/v2/bot/message/push";
+const SEND_MULTICAST_API: &str = "https://api.line.me/v2/bot/message/multicast";
+const SEND_NARROWCAST_API: &str = "https://api.line.me/v2/bot/message/narrowcast";
+const GET_NARROWCAST_STATUS_API: &str = "https://api.line.me/v2/bot/message/progress/narrowcast";
+const SEND_BROADCAST_API: &str = "https://api.line.me/v2/bot/message/broadcast";
+const GET_ADDITIONAL_MESSAGE_LIMIT_API: &str = "https://api.line.me/v2/bot/message/quota";
+const GET_THIS_MONTH_MESSAGES_COUNT_API: &str =
+    "https://api.line.me/v2/bot/message/quota/consumption";
+const GET_REPLY_MESSAGES_COUNT_API: &str = "https://api.line.me/v2/bot/message/delivery/reply";
+const GET_PUSH_MESSAGES_COUNT_API: &str = "https://api.line.me/v2/bot/message/delivery/push";
+const GET_MULTICAST_MESSAGES_COUNT_API: &str =
+    "https://api.line.me/v2/bot/message/delivery/multicast";
+const GET_BROADCAST_MESSAGE_COUNT_API: &str =
+    "https://api.line.me/v2/bot/message/delivery/broadcast";
+
+macro_rules! get_content_api {
+    ($message_id:tt) => {
+        format!(
+            "https://api-data.line.me/v2/bot/message/{}/content",
+            $message_id
+        )
+    };
+}
 
 #[derive(Serialize)]
 pub struct Sender {
@@ -389,7 +412,7 @@ pub async fn broadcast(
 ) -> Result<BroadcastResponse, Box<dyn Error>> {
     let messages_json = serde_json::to_string(&messages)?;
 
-    let res = post_json(channel_access_token, BROADCAST_API, &messages_json).await?;
+    let res = post_json(channel_access_token, SEND_BROADCAST_API, &messages_json).await?;
 
     Ok(BroadcastResponse {
         status: res.status(),
