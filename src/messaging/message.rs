@@ -118,7 +118,7 @@ impl Message {
     ) -> Message {
         Message::StickerMessage {
             sender: sender,
-            message_type: String::from("sticker"),
+            message_type: String::from("image"),
             package_id: original_content_url.into(),
             sticker_id: preview_image_url.into(),
         }
