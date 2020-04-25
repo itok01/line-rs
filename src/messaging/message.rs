@@ -82,6 +82,7 @@ impl Area {
 
 #[derive(Serialize)]
 pub struct ExternalLink {
+    #[serde(rename = "linkUri")]
     pub link_uri: String,
     pub label: String,
 }
@@ -102,6 +103,7 @@ pub struct Video {
     #[serde(rename = "previewImageUrl")]
     pub preview_image_url: String,
     pub area: Area,
+    #[serde(rename = "externalLink")]
     pub external_link: ExternalLink,
 }
 
@@ -224,8 +226,11 @@ pub enum Message {
         sender: Option<Sender>,
         #[serde(rename = "type")]
         message_type: String,
+        #[serde(rename = "baseUrl")]
         base_url: String,
+        #[serde(rename = "altText")]
         alt_text: String,
+        #[serde(rename = "baseSize")]
         base_size: BaseSize,
         video: Option<Video>,
         actions: Actions,
