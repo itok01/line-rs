@@ -77,6 +77,32 @@ impl TextMessage {
 }
 
 #[derive(Serialize)]
+pub struct StickerMessage {
+    pub sender: Option<Sender>,
+    #[serde(rename = "type")]
+    pub message_type: String,
+    #[serde(rename = "packageId")]
+    pub package_id: String,
+    #[serde(rename = "stickerId")]
+    pub sticker_id: String,
+}
+
+impl StickerMessage {
+    pub fn new<S: Into<String>>(
+        package_id: String,
+        sticker_id: String,
+        sender: Option<Sender>,
+    ) -> StickerMessage {
+        StickerMessage {
+            sender: sender,
+            message_type: String::from("sticker"),
+            package_id: package_id,
+            sticker_id: sticker_id,
+        }
+    }
+}
+
+#[derive(Serialize)]
 pub struct Messages {
     pub messages: Vec<TextMessage>,
 }
