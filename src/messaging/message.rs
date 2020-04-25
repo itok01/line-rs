@@ -53,6 +53,120 @@ impl Emojis {
 }
 
 #[derive(Serialize)]
+pub struct BaseSize {
+    pub width: usize,
+    pub height: usize,
+}
+
+impl BaseSize {
+    pub fn new(width: usize, height: usize) -> BaseSize {
+        BaseSize {
+            width: width,
+            height: height,
+        }
+    }
+}
+
+#[derive(Serialize)]
+pub struct Area {
+    pub x: usize,
+    pub y: usize,
+    pub width: usize,
+    pub height: usize,
+}
+
+impl Area {
+    pub fn new(x: usize, y: usize, width: usize, height: usize) -> Area {
+        Area {
+            x: x,
+            y: y,
+            width: width,
+            height: height,
+        }
+    }
+}
+
+#[derive(Serialize)]
+pub struct ExternalLink {
+    pub link_uri: String,
+    pub label: String,
+}
+
+impl ExternalLink {
+    pub fn new<S: Into<String>>(link_uri: S, label: S) -> ExternalLink {
+        ExternalLink {
+            link_uri: link_uri.into(),
+            label: label.into(),
+        }
+    }
+}
+
+#[derive(Serialize)]
+pub struct Video {
+    #[serde(rename = "originalContentUrl")]
+    pub original_content_url: String,
+    #[serde(rename = "previewImageUrl")]
+    pub preview_image_url: String,
+    pub area: Area,
+    pub external_link: ExternalLink,
+}
+
+impl Video {
+    pub fn new<S: Into<String>>(
+        original_content_url: S,
+        preview_image_url: S,
+        area: Area,
+        external_link: ExternalLink,
+    ) -> Video {
+        Video {
+            original_content_url: original_content_url.into(),
+            preview_image_url: preview_image_url.into(),
+            area: area,
+            external_link: external_link,
+        }
+    }
+}
+
+#[derive(Serialize)]
+pub struct Action {
+    sender: Option<Sender>,
+    #[serde(rename = "type")]
+    message_type: String,
+    #[serde(rename = "originalContentUrl")]
+    original_content_url: String,
+    #[serde(rename = "previewImageUrl")]
+    preview_image_url: String,
+}
+
+impl Action {
+    pub fn new<S: Into<String>>(
+        original_content_url: S,
+        preview_image_url: S,
+        sender: Option<Sender>,
+    ) -> Action {
+        Action {
+            sender: sender,
+            message_type: String::from("video"),
+            original_content_url: original_content_url.into(),
+            preview_image_url: preview_image_url.into(),
+        }
+    }
+}
+
+#[derive(Serialize)]
+pub struct Actions {
+    pub actions: Vec<Action>,
+}
+
+impl Actions {
+    pub fn new() -> Actions {
+        Actions {
+            actions: Vec::new(),
+        }
+    }
+}
+
+#[derive(Serialize)]
 #[serde(untagged)]
 pub enum Message {
     TextMessage {
@@ -110,6 +224,17 @@ pub enum Message {
         address: String,
         latitude: f64,
         longitude: f64,
+    },
+
+    ImagemapMessage {
+        sender: Option<Sender>,
+        #[serde(rename = "type")]
+        message_type: String,
+        base_url: String,
+        alt_text: String,
+        base_size: BaseSize,
+        video: Option<Video>,
+        actions: Actions,
     },
 }
 
@@ -193,6 +318,25 @@ impl Message {
             address: address.into(),
             latitude: latitude,
             longitude: longitude,
+        }
+    }
+
+    pub fn new_imagemap_message<S: Into<String>>(
+        base_url: S,
+        alt_text: S,
+        base_size: BaseSize,
+        video: Option<Video>,
+        actions: Actions,
+        sender: Option<Sender>,
+    ) -> Message {
+        Message::ImagemapMessage {
+            sender,
+            message_type: String::from("imagemap"),
+            base_url: base_url.into(),
+            alt_text: alt_text.into(),
+            base_size,
+            video,
+            actions,
         }
     }
 }
