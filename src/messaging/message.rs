@@ -157,7 +157,7 @@ impl Action {
 
     pub fn new_message_action<S: Into<String>>(label: S, text: S, area: Area) -> Action {
         Action::Message {
-            action_type: String::from("uri"),
+            action_type: String::from("message"),
             label: label.into(),
             text: text.into(),
             area,
@@ -166,6 +166,7 @@ impl Action {
 }
 
 #[derive(Serialize)]
+#[serde(transparent)]
 pub struct Actions {
     pub actions: Vec<Action>,
 }
