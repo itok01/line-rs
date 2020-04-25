@@ -63,9 +63,9 @@ pub struct TextMessage {
 
 impl TextMessage {
     pub fn new<S: Into<String>>(
-        sender: Option<Sender>,
         text: S,
         emojis: Option<Emojis>,
+        sender: Option<Sender>,
     ) -> TextMessage {
         TextMessage {
             sender: sender,
