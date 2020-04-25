@@ -30,6 +30,16 @@ pub struct Emoji {
     pub emoji_id: String,
 }
 
+impl Emoji {
+    pub fn new(index: usize, product_id: String, emoji_id: String) -> Emoji {
+        Emoji {
+            index: index,
+            product_id: product_id,
+            emoji_id: emoji_id,
+        }
+    }
+}
+
 #[derive(Serialize)]
 pub struct TextMessage {
     pub sender: Option<Sender>,
