@@ -461,6 +461,39 @@ pub async fn send_push_message(
 }
 
 #[derive(Serialize)]
+pub struct SendMulticastMessageRequest {
+    #[serde(rename = "replyToken")]
+    pub to: Vec<String>,
+    pub messages: Messages,
+    #[serde(rename = "notificationDisabled")]
+    pub notification_disabled: Option<bool>,
+}
+
+pub struct SendMulticastMessageResponse {
+    pub status: StatusCode,
+    pub system_message: String,
+}
+
+pub async fn send_multicast_message(
+    channel_access_token: &str,
+    request: SendMulticastMessageRequest,
+) -> Result<SendMulticastMessageResponse, Box<dyn Error>> {
+    let request_json = serde_json::to_string(&request)?;
+
+    let res = post_json(
+        channel_access_token,
+        SEND_MULTICAST_MESSAGE_API,
+        &request_json,
+    )
+    .await?;
+
+    Ok(SendMulticastMessageResponse {
+        status: res.status(),
+        system_message: res.text().await?,
+    })
+}
+
+#[derive(Serialize)]
 pub struct SendBroadcastMessageRequest {
     pub messages: Messages,
 }
