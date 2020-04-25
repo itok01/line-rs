@@ -404,6 +404,34 @@ impl Messages {
 }
 
 #[derive(Serialize)]
+pub struct ReplyRequest {
+    #[serde(rename = "replyToken")]
+    pub reply_token: String,
+    pub messages: Messages,
+    #[serde(rename = "notificationDisabled")]
+    pub notification_disabled: Option<bool>,
+}
+
+pub struct ReplyResponse {
+    pub status: StatusCode,
+    pub system_message: String,
+}
+
+pub async fn reply(
+    channel_access_token: &str,
+    request: ReplyRequest,
+) -> Result<ReplyResponse, Box<dyn Error>> {
+    let request_json = serde_json::to_string(&request)?;
+
+    let res = post_json(channel_access_token, SEND_REPLY_API, &request_json).await?;
+
+    Ok(ReplyResponse {
+        status: res.status(),
+        system_message: res.text().await?,
+    })
+}
+
+#[derive(Serialize)]
 pub struct BroadcastRequest {
     pub messages: Messages,
 }
