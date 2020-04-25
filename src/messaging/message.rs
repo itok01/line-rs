@@ -41,17 +41,45 @@ impl Emoji {
 }
 
 #[derive(Serialize)]
+pub struct Emojis {
+    pub emojis: Vec<Emoji>,
+}
+
+impl Emojis {
+    pub fn new(emojis: Vec<Emoji>) -> Emojis {
+        Emojis { emojis: emojis }
+    }
+}
+
+#[derive(Serialize)]
 pub struct TextMessage {
     pub sender: Option<Sender>,
     #[serde(rename = "type")]
     pub message_type: String,
     pub text: String,
-    pub emojis: Option<Emoji>,
+    pub emojis: Option<Emojis>,
+}
+
+impl TextMessage {
+    pub fn new(sender: Option<Sender>, text: String, emojis: Option<Emojis>) -> TextMessage {
+        TextMessage {
+            sender: sender,
+            message_type: String::from("text"),
+            text: text,
+            emojis: emojis,
+        }
+    }
 }
 
 #[derive(Serialize)]
 pub struct Messages {
     pub messages: Vec<TextMessage>,
+}
+
+impl Messages {
+    pub fn new(messages: Vec<TextMessage>) -> Messages {
+        Messages { messages: messages }
+    }
 }
 
 pub struct BroadcastResponse {
