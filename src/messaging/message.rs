@@ -5,13 +5,14 @@ use std::error::Error;
 
 use super::client::post_json;
 
-const SEND_REPLY_API: &str = "https://api.line.me/v2/bot/message/reply";
-const SEND_PUSH_API: &str = "https://api.line.me/v2/bot/message/push";
-const SEND_MULTICAST_API: &str = "https://api.line.me/v2/bot/message/multicast";
-const SEND_NARROWCAST_API: &str = "https://api.line.me/v2/bot/message/narrowcast";
-const GET_NARROWCAST_STATUS_API: &str = "https://api.line.me/v2/bot/message/progress/narrowcast";
-const SEND_BROADCAST_API: &str = "https://api.line.me/v2/bot/message/broadcast";
-const GET_ADDITIONAL_MESSAGE_LIMIT_API: &str = "https://api.line.me/v2/bot/message/quota";
+const SEND_REPLY_MESSAGE_API: &str = "https://api.line.me/v2/bot/message/reply";
+const SEND_PUSH_MESSAGE_API: &str = "https://api.line.me/v2/bot/message/push";
+const SEND_MULTICAST_MESSAGE_API: &str = "https://api.line.me/v2/bot/message/multicast";
+const SEND_NARROWCAST_MESSAGE_API: &str = "https://api.line.me/v2/bot/message/narrowcast";
+const GET_NARROWCAST_MESSAGE_STATUS_API: &str =
+    "https://api.line.me/v2/bot/message/progress/narrowcast";
+const SEND_BROADCAST_MESSAGE_API: &str = "https://api.line.me/v2/bot/message/broadcast";
+const GET_ADDITIONAL_MESSAGES_LIMIT_API: &str = "https://api.line.me/v2/bot/message/quota";
 const GET_THIS_MONTH_MESSAGES_COUNT_API: &str =
     "https://api.line.me/v2/bot/message/quota/consumption";
 const GET_REPLY_MESSAGES_COUNT_API: &str = "https://api.line.me/v2/bot/message/delivery/reply";
@@ -417,13 +418,13 @@ pub struct ReplyResponse {
     pub system_message: String,
 }
 
-pub async fn reply(
+pub async fn send_reply_message(
     channel_access_token: &str,
     request: ReplyRequest,
 ) -> Result<ReplyResponse, Box<dyn Error>> {
     let request_json = serde_json::to_string(&request)?;
 
-    let res = post_json(channel_access_token, SEND_REPLY_API, &request_json).await?;
+    let res = post_json(channel_access_token, SEND_REPLY_MESSAGE_API, &request_json).await?;
 
     Ok(ReplyResponse {
         status: res.status(),
@@ -441,13 +442,18 @@ pub struct BroadcastResponse {
     pub system_message: String,
 }
 
-pub async fn broadcast(
+pub async fn send_broadcast_message(
     channel_access_token: &str,
     request: BroadcastRequest,
 ) -> Result<BroadcastResponse, Box<dyn Error>> {
     let request_json = serde_json::to_string(&request)?;
 
-    let res = post_json(channel_access_token, SEND_BROADCAST_API, &request_json).await?;
+    let res = post_json(
+        channel_access_token,
+        SEND_BROADCAST_MESSAGE_API,
+        &request_json,
+    )
+    .await?;
 
     Ok(BroadcastResponse {
         status: res.status(),
