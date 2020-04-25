@@ -494,6 +494,112 @@ pub async fn send_multicast_message(
 }
 
 #[derive(Serialize)]
+pub enum Recipient {
+    Audience {
+        #[serde(rename = "type")]
+        recipient_type: String,
+        #[serde(rename = "audienceGroupId")]
+        audience_group_id: u64,
+    },
+
+    Operator {
+        #[serde(rename = "type")]
+        recipient_type: String,
+        and: Option<Vec<Box<Recipient>>>,
+        or: Option<Vec<Box<Recipient>>>,
+        not: Option<Box<Recipient>>,
+    },
+}
+
+#[derive(Serialize)]
+pub enum Demographic {
+    Gender {
+        #[serde(rename = "type")]
+        demographic_type: String,
+        #[serde(rename = "oneOf")]
+        one_of: Vec<String>,
+    },
+
+    Age {
+        #[serde(rename = "type")]
+        demographic_type: String,
+        gte: Option<String>,
+        lt: Option<String>,
+    },
+
+    AppType {
+        #[serde(rename = "type")]
+        demographic_type: String,
+        one_of: Vec<String>,
+    },
+
+    Area {
+        #[serde(rename = "type")]
+        demographic_type: String,
+        one_of: Vec<String>,
+    },
+
+    SubscriptionPeriod {
+        #[serde(rename = "type")]
+        gte: Option<String>,
+        lt: Option<String>,
+    },
+
+    Operator {
+        #[serde(rename = "type")]
+        demographic_type: String,
+        and: Option<Vec<Box<Demographic>>>,
+        or: Option<Vec<Box<Demographic>>>,
+        not: Option<Box<Demographic>>,
+    },
+}
+
+#[derive(Serialize)]
+pub struct Filter {
+    pub demographic: Demographic,
+}
+
+#[derive(Serialize)]
+pub struct Limit {
+    pub max: usize,
+}
+
+#[derive(Serialize)]
+pub struct SendNarrowcastMessageRequest {
+    #[serde(rename = "replyToken")]
+    pub messages: Messages,
+    pub recipient: Option<Recipient>,
+    pub filter: Option<Filter>,
+    pub limit: Option<Limit>,
+    #[serde(rename = "notificationDisabled")]
+    pub notification_disabled: Option<bool>,
+}
+
+pub struct SendNarrowcastMessageResponse {
+    pub status: StatusCode,
+    pub system_message: String,
+}
+
+pub async fn send_narrowcast_message(
+    channel_access_token: &str,
+    request: SendNarrowcastMessageRequest,
+) -> Result<SendNarrowcastMessageResponse, Box<dyn Error>> {
+    let request_json = serde_json::to_string(&request)?;
+
+    let res = post_json(
+        channel_access_token,
+        SEND_NARROWCAST_MESSAGE_API,
+        &request_json,
+    )
+    .await?;
+
+    Ok(SendNarrowcastMessageResponse {
+        status: res.status(),
+        system_message: res.text().await?,
+    })
+}
+
+#[derive(Serialize)]
 pub struct SendBroadcastMessageRequest {
     pub messages: Messages,
 }
