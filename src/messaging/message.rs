@@ -116,11 +116,11 @@ impl Message {
         preview_image_url: S,
         sender: Option<Sender>,
     ) -> Message {
-        Message::StickerMessage {
+        Message::ImageMessage {
             sender: sender,
             message_type: String::from("image"),
-            package_id: original_content_url.into(),
-            sticker_id: preview_image_url.into(),
+            original_content_url: original_content_url.into(),
+            preview_image_url: preview_image_url.into(),
         }
     }
 }
