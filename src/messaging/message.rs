@@ -15,10 +15,7 @@ pub struct Sender {
 
 impl Sender {
     pub fn new(name: Option<String>, icon_url: Option<String>) -> Sender {
-        Sender {
-            name: name,
-            icon_url: icon_url,
-        }
+        Sender { name, icon_url }
     }
 }
 
@@ -34,7 +31,7 @@ pub struct Emoji {
 impl Emoji {
     pub fn new<S: Into<String>>(index: usize, product_id: S, emoji_id: S) -> Emoji {
         Emoji {
-            index: index,
+            index,
             product_id: product_id.into(),
             emoji_id: emoji_id.into(),
         }
@@ -48,7 +45,7 @@ pub struct Emojis {
 
 impl Emojis {
     pub fn new(emojis: Vec<Emoji>) -> Emojis {
-        Emojis { emojis: emojis }
+        Emojis { emojis }
     }
 }
 
@@ -60,10 +57,7 @@ pub struct BaseSize {
 
 impl BaseSize {
     pub fn new(width: usize, height: usize) -> BaseSize {
-        BaseSize {
-            width: width,
-            height: height,
-        }
+        BaseSize { width, height }
     }
 }
 
@@ -78,10 +72,10 @@ pub struct Area {
 impl Area {
     pub fn new(x: usize, y: usize, width: usize, height: usize) -> Area {
         Area {
-            x: x,
-            y: y,
-            width: width,
-            height: height,
+            x,
+            y,
+            width,
+            height,
         }
     }
 }
@@ -121,8 +115,8 @@ impl Video {
         Video {
             original_content_url: original_content_url.into(),
             preview_image_url: preview_image_url.into(),
-            area: area,
-            external_link: external_link,
+            area,
+            external_link,
         }
     }
 }
@@ -245,10 +239,10 @@ impl Message {
         sender: Option<Sender>,
     ) -> Message {
         Message::TextMessage {
-            sender: sender,
+            sender,
             message_type: String::from("text"),
             text: text.into(),
-            emojis: emojis,
+            emojis,
         }
     }
 
@@ -258,7 +252,7 @@ impl Message {
         sender: Option<Sender>,
     ) -> Message {
         Message::StickerMessage {
-            sender: sender,
+            sender,
             message_type: String::from("sticker"),
             package_id: package_id.into(),
             sticker_id: sticker_id.into(),
@@ -271,7 +265,7 @@ impl Message {
         sender: Option<Sender>,
     ) -> Message {
         Message::ImageMessage {
-            sender: sender,
+            sender,
             message_type: String::from("image"),
             original_content_url: original_content_url.into(),
             preview_image_url: preview_image_url.into(),
@@ -284,7 +278,7 @@ impl Message {
         sender: Option<Sender>,
     ) -> Message {
         Message::VideoMessage {
-            sender: sender,
+            sender,
             message_type: String::from("video"),
             original_content_url: original_content_url.into(),
             preview_image_url: preview_image_url.into(),
@@ -297,10 +291,10 @@ impl Message {
         sender: Option<Sender>,
     ) -> Message {
         Message::AudioMessage {
-            sender: sender,
+            sender,
             message_type: String::from("audio"),
             original_content_url: original_content_url.into(),
-            duration: duration,
+            duration,
         }
     }
 
@@ -312,12 +306,12 @@ impl Message {
         sender: Option<Sender>,
     ) -> Message {
         Message::LocationMessage {
-            sender: sender,
+            sender,
             message_type: String::from("location"),
             title: title.into(),
             address: address.into(),
-            latitude: latitude,
-            longitude: longitude,
+            latitude,
+            longitude,
         }
     }
 
