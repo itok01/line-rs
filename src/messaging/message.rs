@@ -124,7 +124,6 @@ pub async fn broadcast(
     messages: Messages,
 ) -> Result<BroadcastResponse, Box<dyn Error>> {
     let messages_json = serde_json::to_string(&messages)?;
-    println!("{}", messages_json);
 
     let res = post_json(channel_access_token, BROADCAST_API, &messages_json).await?;
 
