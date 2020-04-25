@@ -1,5 +1,6 @@
 use reqwest::StatusCode;
 use serde::Serialize;
+use std::cell::RefCell;
 use std::error::Error;
 
 use super::client::post_json;
@@ -127,7 +128,6 @@ impl Video {
 #[serde(untagged)]
 pub enum Action {
     URI {
-        sender: Option<Sender>,
         #[serde(rename = "type")]
         action_type: String,
         label: String,
@@ -137,7 +137,6 @@ pub enum Action {
     },
 
     Message {
-        sender: Option<Sender>,
         #[serde(rename = "type")]
         action_type: String,
         label: String,
@@ -147,14 +146,8 @@ pub enum Action {
 }
 
 impl Action {
-    pub fn new_uri_action<S: Into<String>>(
-        label: S,
-        link_uri: S,
-        area: Area,
-        sender: Option<Sender>,
-    ) -> Action {
+    pub fn new_uri_action<S: Into<String>>(label: S, link_uri: S, area: Area) -> Action {
         Action::URI {
-            sender: sender,
             action_type: String::from("uri"),
             label: label.into(),
             link_uri: link_uri.into(),
@@ -162,14 +155,8 @@ impl Action {
         }
     }
 
-    pub fn new_message_action<S: Into<String>>(
-        label: S,
-        text: S,
-        area: Area,
-        sender: Option<Sender>,
-    ) -> Action {
+    pub fn new_message_action<S: Into<String>>(label: S, text: S, area: Area) -> Action {
         Action::Message {
-            sender: sender,
             action_type: String::from("uri"),
             label: label.into(),
             text: text.into(),
@@ -371,13 +358,22 @@ impl Message {
 
 #[derive(Serialize)]
 pub struct Messages {
-    pub messages: Vec<Message>,
+    pub messages: RefCell<Vec<Message>>,
 }
 
 impl Messages {
     pub fn new() -> Messages {
         Messages {
-            messages: Vec::new(),
+            messages: RefCell::from(Vec::with_capacity(5)),
+        }
+    }
+
+    pub fn add(&self, message: Message) -> Result<(), &str> {
+        if self.messages.borrow().len() < 5 {
+            self.messages.borrow_mut().push(message);
+            Ok(())
+        } else {
+            Err("Messages limit is 5")
         }
     }
 }
