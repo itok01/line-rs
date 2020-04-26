@@ -1,9 +1,9 @@
 use reqwest::StatusCode;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use std::cell::RefCell;
 use std::error::Error;
 
-use super::client::post_json;
+use super::client::{get, post_json};
 
 const SEND_REPLY_MESSAGE_API: &str = "https://api.line.me/v2/bot/message/reply";
 const SEND_PUSH_MESSAGE_API: &str = "https://api.line.me/v2/bot/message/push";
@@ -600,12 +600,53 @@ pub async fn send_narrowcast_message(
 }
 
 #[derive(Serialize)]
+pub struct GetNarrowcastMessageStatusRequest {
+    #[serde(rename = "requestId")]
+    pub request_id: String,
+}
+
+#[derive(Deserialize)]
+pub struct GetNarrowcastMessageStatusResponse {
+    #[serde(skip)]
+    pub status: StatusCode,
+    pub system_message: String,
+    pub phase: String,
+    pub success_count: Option<usize>,
+    pub failure_count: Option<usize>,
+    pub target_count: Option<usize>,
+    pub failed_description: String,
+    pub error_code: u8,
+}
+
+pub async fn get_narrowcast_message_status(
+    channel_access_token: &str,
+    request: GetNarrowcastMessageStatusRequest,
+) -> Result<GetNarrowcastMessageStatusResponse, Box<dyn Error>> {
+    let res: reqwest::Response = get(
+        channel_access_token,
+        GET_NARROWCAST_MESSAGE_STATUS_API,
+        &request,
+    )
+    .await?;
+
+    let status = res.status();
+    let text = res.text().await?;
+
+    let mut r: GetNarrowcastMessageStatusResponse = serde_json::from_str(&text)?;
+    r.status = status;
+    r.system_message = text;
+
+    Ok(r)
+}
+
+#[derive(Serialize)]
 pub struct SendBroadcastMessageRequest {
     pub messages: Messages,
 }
 
 pub struct SendBroadcastMessageResponse {
     pub status: StatusCode,
+    pub request_id: reqwest::header::HeaderValue,
     pub system_message: String,
 }
 
@@ -624,6 +665,7 @@ pub async fn send_broadcast_message(
 
     Ok(SendBroadcastMessageResponse {
         status: res.status(),
+        request_id: res.headers().get("X-Line-Request-Id").unwrap().clone(),
         system_message: res.text().await?,
     })
 }
