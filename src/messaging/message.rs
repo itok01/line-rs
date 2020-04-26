@@ -1,3 +1,4 @@
+use bytes::Bytes;
 use reqwest::StatusCode;
 use serde::{Deserialize, Serialize};
 use std::cell::RefCell;
@@ -667,5 +668,40 @@ pub async fn send_broadcast_message(
         status: res.status(),
         request_id: res.headers().get("X-Line-Request-Id").unwrap().clone(),
         system_message: res.text().await?,
+    })
+}
+
+pub struct GetContentRequest {
+    pub message_id: String,
+}
+
+pub struct GetContentResponse {
+    pub status: StatusCode,
+    pub system_message: String,
+    pub content: Box<Bytes>,
+}
+
+pub async fn get_content(
+    channel_access_token: &str,
+    request: GetContentRequest,
+) -> Result<GetContentResponse, Box<dyn Error>> {
+    let res: reqwest::Response = get(
+        channel_access_token,
+        &get_content_api!((request.message_id)),
+        &(),
+    )
+    .await?;
+
+    let status = res.status();
+    let res_bytes: Bytes = res.bytes().await?;
+    let text = match String::from_utf8(res_bytes.to_vec()) {
+        Ok(text) => text,
+        Err(_) => String::new(),
+    };
+
+    Ok(GetContentResponse {
+        status,
+        system_message: text,
+        content: Box::from(res_bytes),
     })
 }
